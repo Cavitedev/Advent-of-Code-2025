@@ -3,7 +3,7 @@ advent_of_code::solution!(1);
 pub fn part_one(input: &str) -> Option<u64> {
     let mut current_value: i64 = 50;
     let mut total_count = 0;
-    input.lines().for_each(|line| {
+    for line in input.lines() {
         let (turn, value) = line.split_at(1);
         let move_value: i64 = value.parse().unwrap();
         current_value = turn_wheel(turn, move_value, &current_value);
@@ -11,7 +11,7 @@ pub fn part_one(input: &str) -> Option<u64> {
         if current_value == 0 {
             total_count += 1
         }
-    });
+    }
     Some(total_count)
 }
 
@@ -65,7 +65,7 @@ mod tests {
 
     #[test]
     fn test_extra_part_two() {
-        let result = part_two(&advent_of_code::template::read_file("extra_examples", DAY));
+        let result = part_two(&advent_of_code::template::read_file_part("examples", DAY, 2));
         assert_eq!(result, Some(1));
     }
 

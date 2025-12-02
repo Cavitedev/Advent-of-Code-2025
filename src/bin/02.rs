@@ -1,4 +1,5 @@
 advent_of_code::solution!(2);
+use fancy_regex::Regex;
 
 fn parse<F>(input: &str, op: F) -> u64
 where
@@ -52,7 +53,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(parse(input, fun_name))
 }
 
-pub fn part_two(input: &str) -> Option<u64> {
+pub fn part_two_v1(input: &str) -> Option<u64> {
     Some(parse(input, |num1_str: &str, num2_str: &str| {
         let num1: u64 = num1_str.parse().unwrap();
         let num2: u64 = num2_str.parse().unwrap();
@@ -86,8 +87,8 @@ pub fn part_two(input: &str) -> Option<u64> {
 
 fn is_repeated(num_str: &str) -> bool {
     for num_length in 1..=num_str.len() / 2 {
-        let half_number: String = num_str.get(0..num_length).unwrap().to_string();
-        let full_number = half_number.repeat(num_str.len() / num_length);
+        let trim_number: String = num_str.get(0..num_length).unwrap().to_string();
+        let full_number = trim_number.repeat(num_str.len() / num_length);
         if full_number == num_str {
             return true;
         }
@@ -95,6 +96,101 @@ fn is_repeated(num_str: &str) -> bool {
 
     false
 }
+
+// 500 ms
+pub fn part_two_brute_force(input: &str) -> Option<u64> {
+    Some(parse(input, |num1_str: &str, num2_str: &str| {
+        let num1: u64 = num1_str.parse().unwrap();
+        let num2: u64 = num2_str.parse().unwrap();
+        let mut total: u64 = 0;
+        for try_number in num1..=num2 {
+            if is_repeated(&try_number.to_string()) {
+                total += try_number;
+            }
+        }
+
+        total
+    }))
+}
+
+//Try regex 1.7s
+pub fn part_two_regex(input: &str) -> Option<u64> {
+    Some(parse(input, |num1_str: &str, num2_str: &str| {
+        let num1: u64 = num1_str.parse().unwrap();
+        let num2: u64 = num2_str.parse().unwrap();
+        let mut total: u64 = 0;
+        let re = Regex::new(r"^(\d+)\1+$").unwrap();
+
+        for try_number in num1..=num2 {
+            if re.is_match(&try_number.to_string()).unwrap() {
+                total += try_number;
+            } else if is_repeated(&try_number.to_string()) {
+                println!("{:?}", try_number);
+            }
+        }
+
+        total
+    }))
+}
+
+struct Range {
+    min_number: u64,
+    max_number: u64,
+}
+
+//Try matching all ranges at once rather than iterating range by range
+// 19 ms
+pub fn part_two(input: &str) -> Option<u64> {
+    let all_ranges: Vec<Range> = input
+        .split(',')
+        .map(|range| {
+            let nums: Vec<&str> = range.split('-').collect();
+            Range {
+                min_number: nums[0].parse().unwrap(),
+                max_number: nums[1].parse().unwrap(),
+            }
+        })
+        .collect();
+
+    let mut total: u64 = 0;
+    let largest_number = all_ranges.iter().map(|r| r.max_number).max().unwrap_or(0);
+    let largest_number_str = &largest_number.to_string();
+
+    let last_check: u64 = largest_number_str
+        .get(0..((largest_number_str.len() + 1) / 2))
+        .unwrap()
+        .parse()
+        .unwrap();
+
+    for iterate_repeated in 1..=last_check {
+        let iterate_string: String = iterate_repeated.to_string();
+        if is_repeated(&iterate_string) {
+            continue;
+        }
+        let repeat_time_end = largest_number_str.len() / iterate_string.len();
+        for repeat_times in 2..=repeat_time_end {
+            let check_number: u64 =
+                iterate_string
+                    .repeat(repeat_times)
+                    .parse()
+                    .unwrap_or_else(|_| {
+                        panic!(
+                            "No se pudo parsear: '{}'",
+                            iterate_string.repeat(repeat_times)
+                        );
+                    });
+            if all_ranges
+                .iter()
+                .any(|n| check_number >= n.min_number && check_number <= n.max_number)
+            {
+                total += check_number;
+            }
+        }
+    }
+
+    Some(total)
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -114,7 +210,37 @@ mod tests {
 
     #[test]
     fn test_part_two() {
+        let result = part_two_v1(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, Some(4174379265u64));
+    }
+
+    #[test]
+    fn test_execute_part_two() {
+        let result = part_two_v1(&advent_of_code::template::read_file("inputs", DAY));
+        assert_eq!(result, Some(79183223243u64));
+    }
+
+    #[test]
+    fn test_execute_part_two_force() {
+        let result = part_two_brute_force(&advent_of_code::template::read_file("inputs", DAY));
+        assert_eq!(result, Some(79183223243u64));
+    }
+
+    #[test]
+    fn test_execute_part_regex() {
+        let result = part_two_regex(&advent_of_code::template::read_file("inputs", DAY));
+        assert_eq!(result, Some(79183223243u64));
+    }
+
+     #[test]
+    fn test_execute_part_two_v2_example() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(4174379265u64));
+    }
+
+    #[test]
+    fn test_execute_part_two_v2() {
+        let result = part_two(&advent_of_code::template::read_file("inputs", DAY));
+        assert_eq!(result, Some(79183223243u64));
     }
 }

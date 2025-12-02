@@ -8,8 +8,8 @@ where
     let mut total: u64 = 0;
 
     for split in input.split(',') {
-        let numbers: Vec<&str> = split.split('-').collect();
-        total += op(numbers[0], numbers[1])
+        let (start, end) = split.split_once('-').unwrap();
+        total += op(start, end)
     }
 
     total
@@ -143,11 +143,11 @@ struct Range {
 pub fn part_two(input: &str) -> Option<u64> {
     let all_ranges: Vec<Range> = input
         .split(',')
-        .map(|range| {
-            let nums: Vec<&str> = range.split('-').collect();
+        .map(|split| {
+            let (start, end) = split.split_once('-').unwrap();
             Range {
-                min_number: nums[0].parse().unwrap(),
-                max_number: nums[1].parse().unwrap(),
+                min_number: start.parse().unwrap(),
+                max_number: end.parse().unwrap(),
             }
         })
         .collect();
@@ -191,6 +191,76 @@ pub fn part_two(input: &str) -> Option<u64> {
     Some(total)
 }
 
+pub fn part_two_online(input: &str) -> Option<u64> {
+    let part2: u64 = input
+        .split(",")
+        .map(|s| {
+            let (start, end) = s.split_once("-").unwrap();
+            let [start, end] = [start, end].map(|s| s.parse::<u64>().unwrap());
+            sum_in_range(start, end, 2) + sum_in_range(start, end, 3) + sum_in_range(start, end, 5)
+                - sum_in_range(start, end, 6)
+                + sum_in_range(start, end, 7)
+                - sum_in_range(start, end, 10)
+        })
+        .sum();
+
+    Some(part2)
+}
+
+fn sums_up_to(n: u64, div: u32) -> u64 {
+    if n == 0 {
+        return 0;
+    };
+    let log = n.ilog10();
+    let grouped_sum = groupedsum(log, div);
+    grouped_sum
+        + if (log + 1) % div == 0 {
+            let rep = rep(log + 1, div);
+            offset_sum(n / rep - 10u64.pow(log) / rep, log / div) * rep
+        } else {
+            0
+        }
+}
+
+const fn offset_sum(count: u64, log: u32) -> u64 {
+    sum(count + (10u64.pow(log) - 1)) - sum(10u64.pow(log) - 1)
+}
+
+const fn sum(n: u64) -> u64 {
+    let n = n as u128;
+    ((n * (n + 1)) / 2) as u64
+}
+
+fn rep(digits: u32, div: u32) -> u64 {
+    let mut out = 1;
+    let mult = 10u64.pow(digits / div);
+    let mut c = 1;
+    while c < div {
+        out *= mult;
+        out += 1;
+        c += 1
+    }
+    out
+}
+fn groupedsum(n: u32, div: u32) -> u64 {
+    (0..=n)
+        .step_by(div as usize)
+        .skip(1)
+        .map(|i| {
+            let log = i as u32 - 1;
+            let rep = rep(log + 1, div);
+            let n = 10u64.pow(log + 1) - 1;
+            offset_sum(n / rep - 10u64.pow(log) / rep, log / div) * rep
+        })
+        .sum()
+}
+
+fn sum_in_range(start: u64, end_inclusive: u64, div: u32) -> u64 {
+    match start.checked_sub(1) {
+        Some(prev) => sums_up_to(end_inclusive, div) - sums_up_to(prev, div),
+        None => sums_up_to(end_inclusive, div),
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -232,7 +302,7 @@ mod tests {
         assert_eq!(result, Some(79183223243u64));
     }
 
-     #[test]
+    #[test]
     fn test_execute_part_two_v2_example() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(4174379265u64));
@@ -242,5 +312,23 @@ mod tests {
     fn test_execute_part_two_v2() {
         let result = part_two(&advent_of_code::template::read_file("inputs", DAY));
         assert_eq!(result, Some(79183223243u64));
+    }
+
+    #[test]
+    fn test_execute_part_two_online_example() {
+        let result = part_two_online(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, Some(4174379265u64));
+    }
+
+    #[test]
+    fn test_stuff() {
+        let result = sums_up_to(115, 2);
+        assert_eq!(result, 101);
+    }
+
+    #[test]
+    fn test_stuff2() {
+        let result = offset_sum(9, 0);
+        assert_eq!(result, 45);
     }
 }

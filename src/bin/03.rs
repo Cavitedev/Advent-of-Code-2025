@@ -1,16 +1,16 @@
 advent_of_code::solution!(3);
 
-pub fn part_one(input: &str) -> Option<u64> {
+pub fn part_one_v1(input: &str) -> Option<u64> {
     let mut sum = 0;
     for line in input.lines() {
-        let joltage = joltage_bank(line, 2);
+        let joltage = joltage_bank_v1(line, 2);
 
         sum += joltage;
     }
     Some(sum)
 }
 
-fn joltage_bank(line: &str, length: usize) -> u64 {
+fn joltage_bank_v1(line: &str, length: usize) -> u64 {
     // / is symbol before 0 in ascii
     let mut largest_num = vec!['/'; length];
 
@@ -37,11 +37,57 @@ fn joltage_bank(line: &str, length: usize) -> u64 {
     joltage
 }
 
+pub fn part_two_v1(input: &str) -> Option<u64> {
+    let mut sum = 0;
+    for line in input.lines() {
+        let joltage = joltage_bank_v1(line, 12);
+
+        sum += joltage;
+    }
+    Some(sum)
+}
+
+fn joltage_bank_v2(line: &str, length: usize) -> u64 {
+    // / is symbol before 0 in ascii
+    let line_chars: &[u8] = line.as_bytes();
+    let mut largest_num: Vec<u8> = Vec::with_capacity(length);
+    let mut check_start: usize = 0;
+    let mut check_end: usize = line.len() - length;
+
+    for _ in 0..length {
+        let mut max_num = line_chars[check_start];
+        let mut max_pos = check_start;
+        for j in check_start + 1..=check_end {
+            if (line_chars[j] > max_num) {
+                max_num = line_chars[j];
+                max_pos = j;
+            }
+        }
+        largest_num.push(max_num);
+        check_start = max_pos + 1;
+        check_end += 1;
+    }
+
+    let joltage = String::from_utf8(largest_num)
+        .unwrap()
+        .parse::<u64>()
+        .unwrap();
+    joltage
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    let mut sum = 0;
+    for line in input.lines() {
+        let joltage = joltage_bank_v2(line, 2);
+        sum += joltage;
+    }
+    Some(sum)
+}
+
 pub fn part_two(input: &str) -> Option<u64> {
     let mut sum = 0;
     for line in input.lines() {
-        let joltage = joltage_bank(line, 12);
-
+        let joltage = joltage_bank_v2(line, 12);
         sum += joltage;
     }
     Some(sum)

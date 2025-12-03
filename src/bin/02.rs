@@ -9,7 +9,7 @@ where
 
     for split in input.split(',') {
         let (start, end) = split.split_once('-').unwrap();
-        total += op(start, end)
+        total += op(start, end.trim())
     }
 
     total
@@ -147,7 +147,7 @@ pub fn part_two(input: &str) -> Option<u64> {
             let (start, end) = split.split_once('-').unwrap();
             Range {
                 min_number: start.parse().unwrap(),
-                max_number: end.parse().unwrap(),
+                max_number: end.trim().parse().unwrap(),
             }
         })
         .collect();

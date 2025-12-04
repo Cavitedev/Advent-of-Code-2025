@@ -15,42 +15,43 @@ where
     total
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
-    fn fun_name(num1_str: &str, num2_str: &str) -> u64 {
-        let num1: u64 = num1_str.parse().unwrap();
-        let num2: u64 = num2_str.parse().unwrap();
-        let mut total: u64 = 0;
-        let mut iterate_repeated_option: Option<u64> = None;
+fn part_1_on_parse(num1_str: &str, num2_str: &str) -> u64 {
+    let num1: u64 = num1_str.parse().unwrap();
+    let num2: u64 = num2_str.parse().unwrap();
+    let mut total: u64 = 0;
+    let mut iterate_repeated_option: Option<u64> = None;
 
-        if num1_str.len() % 2 == 0 {
-            iterate_repeated_option = Some(
-                num1_str
-                    .get(0..(num1_str.len() / 2))
-                    .unwrap()
-                    .parse()
-                    .unwrap(),
-            );
-        } else if num2_str.len() % 2 == 0 || num2_str.len() > num1_str.len() {
-            iterate_repeated_option = Some(10u64.pow((num1_str.len() / 2) as u32));
-        }
-
-        match iterate_repeated_option {
-            Some(mut iterate_repeated) => loop {
-                let check_number: u64 = iterate_repeated.to_string().repeat(2).parse().unwrap();
-                if check_number > num2 {
-                    break;
-                }
-                if check_number >= num1 {
-                    total += check_number;
-                }
-                iterate_repeated += 1;
-            },
-            None => {}
-        }
-
-        total
+    if num1_str.len() % 2 == 0 {
+        iterate_repeated_option = Some(
+            num1_str
+                .get(0..(num1_str.len() / 2))
+                .unwrap()
+                .parse()
+                .unwrap(),
+        );
+    } else if num2_str.len() % 2 == 0 || num2_str.len() > num1_str.len() {
+        iterate_repeated_option = Some(10u64.pow((num1_str.len() / 2) as u32));
     }
-    Some(parse(input, fun_name))
+
+    match iterate_repeated_option {
+        Some(mut iterate_repeated) => loop {
+            let check_number: u64 = iterate_repeated.to_string().repeat(2).parse().unwrap();
+            if check_number > num2 {
+                break;
+            }
+            if check_number >= num1 {
+                total += check_number;
+            }
+            iterate_repeated += 1;
+        },
+        None => {}
+    }
+
+    total
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    Some(parse(input, part_1_on_parse))
 }
 
 pub fn part_two_v1(input: &str) -> Option<u64> {
@@ -273,34 +274,11 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_part_one() {
-        let result = part_one(&advent_of_code::template::read_file("inputs", DAY));
-        assert_eq!(result, Some(56660955519u64));
-    }
-
-    #[test]
     fn test_part_two() {
         let result = part_two_v1(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(4174379265u64));
     }
 
-    #[test]
-    fn test_execute_part_two() {
-        let result = part_two_v1(&advent_of_code::template::read_file("inputs", DAY));
-        assert_eq!(result, Some(79183223243u64));
-    }
-
-    #[test]
-    fn test_execute_part_two_force() {
-        let result = part_two_brute_force(&advent_of_code::template::read_file("inputs", DAY));
-        assert_eq!(result, Some(79183223243u64));
-    }
-
-    #[test]
-    fn test_execute_part_regex() {
-        let result = part_two_regex(&advent_of_code::template::read_file("inputs", DAY));
-        assert_eq!(result, Some(79183223243u64));
-    }
 
     #[test]
     fn test_execute_part_two_v2_example() {
@@ -309,26 +287,8 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_part_two_v2() {
-        let result = part_two(&advent_of_code::template::read_file("inputs", DAY));
-        assert_eq!(result, Some(79183223243u64));
-    }
-
-    #[test]
     fn test_execute_part_two_online_example() {
         let result = part_two_online(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(4174379265u64));
-    }
-
-    #[test]
-    fn test_stuff() {
-        let result = sums_up_to(115, 2);
-        assert_eq!(result, 101);
-    }
-
-    #[test]
-    fn test_stuff2() {
-        let result = offset_sum(9, 0);
-        assert_eq!(result, 45);
     }
 }

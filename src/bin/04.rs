@@ -136,12 +136,12 @@ fn count_adjacent_v2(grid: &Vec<Vec<u8>>, i: usize, j: usize) -> u8 {
     count
 }
 
-fn get_offsets(i: usize, j: usize, rows: usize, cols: usize) -> Vec<(usize, usize)> {
+fn get_new_candidates(i: usize, j: usize, grid: &mut Vec<Vec<u8>>) -> Vec<(usize, usize)> {
     let mut offsets: Vec<(usize, usize)> = Vec::with_capacity(8);
 
-    for i2 in i.saturating_sub(1)..min(i + 2, rows) {
-        for j2 in j.saturating_sub(1)..min(j + 2, cols) {
-            if i2 == i && j2 == j {
+    for i2 in i.saturating_sub(1)..min(i + 2, grid.len()) {
+        for j2 in j.saturating_sub(1)..min(j + 2, grid[i2].len()) {
+            if grid[i2][j2] != b'@' || i2 == i && j2 == j {
                 continue;
             }
             offsets.push((i2, j2));
@@ -162,7 +162,7 @@ fn add_adjacent(
         if counted_adjacent < 4 {
             grid[i][j] = b'.';
             *count += 1;
-            let offsets = get_offsets(i, j, grid.len(), grid[i].len());
+            let offsets = get_new_candidates(i, j, grid);
             queue.push_all(offsets);
         }
     }

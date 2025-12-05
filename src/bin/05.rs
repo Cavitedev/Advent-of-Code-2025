@@ -1,6 +1,7 @@
 advent_of_code::solution!(5);
 use std::ops::Range;
 use std::str::Lines;
+
 #[derive(Debug)]
 struct ParsedInput<'a> {
     ranges: Vec<Range<u64>>,
@@ -16,16 +17,17 @@ fn parse_input(input: &str) -> ParsedInput<'_> {
             let (num1, num2) = line_range.split_once("-").unwrap_unchecked();
 
             ranges.push(Range {
-                start: num1.parse().unwrap_unchecked(),
-                end: num2.parse().unwrap_unchecked(),
+                start: atoi_simd::parse(num1.as_bytes()).unwrap_unchecked(),
+                end: atoi_simd::parse(num2.as_bytes()).unwrap_unchecked(),
             });
         }
         ranges.sort_unstable_by(|a, b| a.start.cmp(&b.start));
 
         let mut merged: Vec<Range<u64>> = Vec::with_capacity(ranges.len());
-        let mut last = ranges.remove(0);
-        for range in ranges {
-            if last.end >= range.start -1 {
+        let mut iter = ranges.into_iter();
+        let mut last = iter.next().unwrap();
+        for range in iter {
+            if last.end >= range.start - 1 {
                 last.end = last.end.max(range.end);
             } else {
                 merged.push(last);
@@ -48,7 +50,7 @@ pub fn part_one(input: &str) -> Option<u64> {
 
     unsafe {
         for ingredient_line in parsed_input.ingredient_lines {
-            let ingredient: u64 = ingredient_line.parse().unwrap_unchecked();
+            let ingredient: u64 = atoi_simd::parse(ingredient_line.as_bytes()).unwrap_unchecked();
             let search = parsed_input.ranges.binary_search_by(|r| {
                 if ingredient < r.start {
                     std::cmp::Ordering::Greater

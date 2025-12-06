@@ -28,6 +28,7 @@ atoi_simd = "0.17.0"
 chrono = { version = "0.4.38", optional = true }
 dhat = { version = "0.3.3", optional = true }
 fancy-regex = "0.16.2"
+memchr = "2.7.6"
 pico-args = "0.5.0"
 regex = "1.12.2"
 tinyjson = "2.5.1"

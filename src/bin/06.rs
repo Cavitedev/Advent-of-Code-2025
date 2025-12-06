@@ -1,11 +1,12 @@
 advent_of_code::solution!(6);
+use memchr::memchr_iter;
 
 fn run_1(input: &[u8]) -> u64 {
     let mut pos: usize = 0;
     let mut nums: Vec<Vec<u64>> = Vec::with_capacity(4);
 
     'outer: loop {
-        let mut row_num: Vec<u64> = Vec::with_capacity(50);
+        let mut row_num: Vec<u64> = Vec::with_capacity(1000);
         let mut current_num = 0;
         'line: loop {
             let byte = input[pos];
@@ -18,12 +19,10 @@ fn run_1(input: &[u8]) -> u64 {
                 }
                 continue;
             } else if byte == b'\n' {
-                if current_num > 0 {
-                    row_num.push(current_num);
-                }
+                row_num.push(current_num);
                 break 'line;
             }
-            current_num = current_num * 10 + u64::from(byte - b'0');
+            current_num = current_num * 10 + ((byte & 0x0F) as u64);
         }
         nums.push(row_num);
 
@@ -33,7 +32,7 @@ fn run_1(input: &[u8]) -> u64 {
         }
     }
 
-    let mut operations: Vec<u8> = Vec::with_capacity(50);
+    let mut operations: Vec<u8> = Vec::with_capacity(1000);
     'line: loop {
         let byte = input[pos];
         pos += 1;
@@ -71,40 +70,54 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 fn run_2(input: &[u8]) -> u64 {
-    let grid: Vec<&[u8]> = input
-        .split(|&b| b == b'\n')
-        .collect();
-
     let mut sum_total = 0;
 
-    let mut nums: Vec<u64> = Vec::with_capacity(4);
+    unsafe {
+        let mut grid: Vec<&[u8]> = Vec::with_capacity(5);
+        let mut start = 0usize;
+        for nl in memchr_iter(b'\n', input) {
+            grid.push(&input[start..nl]);
+            start = nl + 1;
+        }
 
-    for j in (0..grid[0].len()).rev() {
-        let mut current_num = 0;
-        for i in 0..grid.len() - 2 {
-            let byte = grid[i][j];
-            if byte == b' ' {
-                continue;
+        let op_row = grid.len() - 1;
+        let columns = grid[0].len();
+
+        let mut nums = [0u64; 4];
+        let mut nums_len = 0usize;
+
+        for j in (0..columns).rev() {
+            let mut current_num = 0;
+            for i in 0..op_row {
+                let byte = *grid.get_unchecked(i).get_unchecked(j);
+                if byte == b' ' {
+                    continue;
+                }
+                current_num = current_num * 10 + ((byte & 0x0F) as u64);
             }
-            current_num = current_num * 10 + u64::from(byte - b'0');
-        }
-        // Check if it may be 0 on large input
-        if current_num != 0 {
-            nums.push(current_num);
-        }
+            if current_num != 0 {
+                nums[nums_len] = current_num;
+                nums_len += 1;
 
-        let byte = grid[grid.len() - 2][j];
-        if byte == b' ' {
-            continue;
-        } else if byte == b'+' {
-            sum_total += nums.iter().sum::<u64>();
-            nums.clear();
-        } else {
-            sum_total += nums.iter().product::<u64>();
-            nums.clear();
+                let op_byte = *grid.get_unchecked(op_row).get_unchecked(j);
+                if op_byte == b' ' {
+                    continue;
+                } else if op_byte == b'+' {
+                    for steps in 0..nums_len {
+                        sum_total += nums[steps];
+                    }
+                    nums_len = 0;
+                } else {
+                    let mut product = 1;
+                    for steps in 0..nums_len {
+                        product *= nums[steps];
+                    }
+                    sum_total += product;
+                    nums_len = 0;
+                }
+            }
         }
     }
-
     sum_total
 }
 
@@ -118,7 +131,7 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        let result = part_one(&advent_of_code::template::read_file("examples", DAY));
+        let result = part_one(&advent_of_code::template::read_file("inputs", DAY));
         assert_eq!(result, Some(4277556));
     }
 

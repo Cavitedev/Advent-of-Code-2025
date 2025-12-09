@@ -1,5 +1,6 @@
 advent_of_code::solution!(9);
 
+#[derive(PartialEq)]
 struct Point {
     x: i64,
     y: i64,
@@ -102,13 +103,49 @@ fn lines_from_points(points: &Vec<Point>) -> (Vec<HorizontalLine>, Vec<VerticalL
     (horizontal_lines, vertical_lines)
 }
 
-fn is_vertical_line_between_points(
+fn is_valid_point(
+    vertical_lines: &Vec<VerticalLine>,
+    horizontal_lines: &Vec<HorizontalLine>,
+    point: &Point,
+) -> bool {
+    let mut has_left = false;
+    let mut has_right = false;
+    let mut has_up = false;
+    let mut has_down = false;
+
+    for line in vertical_lines {
+        if line.end_y >= point.y && line.start_y <= point.y {
+            if point.x == line.x {
+                return true;
+            } else if point.x > line.x {
+                has_right = true;
+            } else {
+                has_left = true;
+            }
+        }
+    }
+
+    for line in horizontal_lines {
+        if line.end_x >= point.x && line.start_x <= point.x {
+            if point.y == line.y {
+                return true;
+            } else if point.y > line.y {
+                has_down = true;
+            } else {
+                has_up = true;
+            }
+        }
+    }
+    has_left && has_down && has_up && has_right
+}
+
+fn is_vertical_line_between_points_upper(
     vertical_lines: &Vec<VerticalLine>,
     start: &Point,
     end: &Point,
 ) -> bool {
     for line in vertical_lines {
-        if line.end_y >= start.y
+        if line.end_y > start.y
             && line.start_y <= start.y
             && line.x > start.x.min(end.x)
             && line.x < start.x.max(end.x)
@@ -120,13 +157,49 @@ fn is_vertical_line_between_points(
     false
 }
 
-fn is_horizontal_line_between_points(
+fn is_vertical_line_between_points_down(
+    vertical_lines: &Vec<VerticalLine>,
+    start: &Point,
+    end: &Point,
+) -> bool {
+    for line in vertical_lines {
+        if line.end_y >= start.y
+            && line.start_y < start.y
+            && line.x > start.x.min(end.x)
+            && line.x < start.x.max(end.x)
+        {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn is_horizontal_line_between_points_right(
     horizontal_lines: &Vec<HorizontalLine>,
     start: &Point,
     end: &Point,
 ) -> bool {
     for line in horizontal_lines {
         if line.end_x >= start.x
+            && line.start_x < start.x
+            && line.y > start.y.min(end.y)
+            && line.y < start.y.max(end.y)
+        {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn is_horizontal_line_between_points_left(
+    horizontal_lines: &Vec<HorizontalLine>,
+    start: &Point,
+    end: &Point,
+) -> bool {
+    for line in horizontal_lines {
+        if line.end_x > start.x
             && line.start_x <= start.x
             && line.y > start.y.min(end.y)
             && line.y < start.y.max(end.y)
@@ -144,43 +217,42 @@ fn is_valid_area(
     start: &Point,
     end: &Point,
 ) -> bool {
-    let check1 = !is_vertical_line_between_points(
-        vertical_lines,
-        start,
-        &Point {
-            y: start.y,
-            x: end.x,
-        },
-    );
+    let upper_left: Point = Point {
+        x: start.x.min(end.x),
+        y: start.y.min(end.y),
+    };
 
-    let check2 = !is_horizontal_line_between_points(
-        horizontal_lines,
-        &Point {
-            y: start.y,
-            x: end.x,
-        },
-        end,
-    );
+    let upper_right: Point = Point {
+        x: start.x.max(end.x),
+        y: start.y.min(end.y),
+    };
 
-    let check3 = !is_vertical_line_between_points(
-        vertical_lines,
-        end,
-        &Point {
-            y: end.y,
-            x: start.x,
-        },
-    );
+    let down_right: Point = Point {
+        x: start.x.max(end.x),
+        y: start.y.max(end.y),
+    };
 
-    let check4 = !is_horizontal_line_between_points(
-        horizontal_lines,
-        &Point {
-            y: end.y,
-            x: start.x,
-        },
-        start,
-    );
+    let down_left: Point = Point {
+        x: start.x.min(end.x),
+        y: start.y.max(end.y),
+    };
 
-    check1 && check2 && check3 && check4
+    let check1: bool = is_valid_point(vertical_lines, horizontal_lines, &upper_left);
+    let check2: bool = is_valid_point(vertical_lines, horizontal_lines, &upper_right);
+    let check3: bool = is_valid_point(vertical_lines, horizontal_lines, &down_right);
+    let check4: bool = is_valid_point(vertical_lines, horizontal_lines, &down_left);
+
+    let check5: bool =
+        !is_vertical_line_between_points_upper(vertical_lines, &upper_left, &upper_right);
+
+    let check6: bool =
+        !is_horizontal_line_between_points_right(horizontal_lines, &upper_right, &down_right);
+
+    let check7: bool = !is_vertical_line_between_points_down(vertical_lines, &down_left, &down_right);
+
+    let check8: bool = !is_horizontal_line_between_points_left(horizontal_lines, &upper_left, &down_left);
+
+    check1 && check2 && check3 && check4 && check5 && check6 && check7 && check8
 }
 
 pub fn run_two(input: &str) -> i64 {

@@ -34,7 +34,6 @@ dependencies = [
  "memchr",
  "pico-args",
  "regex",
- "serde_json",
  "tinyjson",
  "z3",
 ]

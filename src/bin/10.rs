@@ -1,7 +1,5 @@
 advent_of_code::solution!(10);
-use std::{
-    collections::{HashSet, VecDeque}
-};
+use std::collections::{HashSet, VecDeque};
 
 use z3::{Optimize, SatResult, ast::Int};
 
@@ -172,7 +170,7 @@ fn lowest_combination_num_to_joltage_goal(
         let indexes_buttons: Vec<usize> = buttons
             .iter()
             .enumerate()
-            .filter(|(index, button)| button.contains(&i))
+            .filter(|(_, button)| button.contains(&i))
             .map(|b| b.0)
             .collect();
 
@@ -206,7 +204,7 @@ fn lowest_combination_num_to_joltage_goal(
 pub fn run_two(input: &str) -> u64 {
     let mut count = 0;
     let machines = parse(input);
-    for (index, machine) in machines.iter().enumerate() {
+    for machine in machines {
         let sol: Vec<u64> =
             lowest_combination_num_to_joltage_goal(&machine.joltage, &machine.buttons).unwrap();
         count += sol.iter().sum::<u64>();

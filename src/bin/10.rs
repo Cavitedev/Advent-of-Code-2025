@@ -1,14 +1,9 @@
 advent_of_code::solution!(10);
 use std::{
-    collections::{HashSet, VecDeque},
-    ops::Index,
+    collections::{HashSet, VecDeque}
 };
 
-use z3::{Context, Optimize, Params, SatResult, ast::Int};
-use z3::{
-    Solver,
-    ast::{Ast, IntoAst},
-};
+use z3::{Optimize, SatResult, ast::Int};
 
 #[derive(Debug)]
 struct Machine {

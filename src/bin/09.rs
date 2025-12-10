@@ -248,9 +248,11 @@ fn is_valid_area(
     let check6: bool =
         !is_horizontal_line_between_points_right(horizontal_lines, &upper_right, &down_right);
 
-    let check7: bool = !is_vertical_line_between_points_down(vertical_lines, &down_left, &down_right);
+    let check7: bool =
+        !is_vertical_line_between_points_down(vertical_lines, &down_left, &down_right);
 
-    let check8: bool = !is_horizontal_line_between_points_left(horizontal_lines, &upper_left, &down_left);
+    let check8: bool =
+        !is_horizontal_line_between_points_left(horizontal_lines, &upper_left, &down_left);
 
     check1 && check2 && check3 && check4 && check5 && check6 && check7 && check8
 }
@@ -264,10 +266,9 @@ pub fn run_two(input: &str) -> i64 {
             let start = &points[i];
             let end = &points[j];
             let area = ((start.x - end.x).abs() + 1) * ((start.y - end.y).abs() + 1);
-            if area > best_area
-                && is_valid_area(&horizontal_lines, &vertical_lines, start, end) {
-                    best_area = area;
-                }
+            if area > best_area && is_valid_area(&horizontal_lines, &vertical_lines, start, end) {
+                best_area = area;
+            }
         }
     }
 
@@ -294,10 +295,11 @@ mod tests {
         assert_eq!(result, Some(24));
     }
 
-
     #[test]
     fn test_part_two_ex_2() {
-        let result = part_two(&advent_of_code::template::read_file_part("examples", DAY, 2));
+        let result = part_two(&advent_of_code::template::read_file_part(
+            "examples", DAY, 2,
+        ));
         assert_eq!(result, Some(15));
     }
 }

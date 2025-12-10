@@ -154,7 +154,7 @@ pub fn part_one(input: &str) -> Option<i32> {
 
 fn lowest_combination_num_to_joltage_goal(
     goal_state: &[i32],
-    buttons: &[Vec<i32>]
+    buttons: &[Vec<i32>],
 ) -> Option<Vec<u64>> {
     let variables: Vec<Int> = (0..buttons.len())
         .map(|i| Int::fresh_const(&i.to_string()))

@@ -33,16 +33,18 @@ fn part_1_on_parse(num1_str: &str, num2_str: &str) -> u64 {
         iterate_repeated_option = Some(10u64.pow((num1_str.len() / 2) as u32));
     }
 
-    if let Some(mut iterate_repeated) = iterate_repeated_option { loop {
-        let check_number: u64 = iterate_repeated.to_string().repeat(2).parse().unwrap();
-        if check_number > num2 {
-            break;
+    if let Some(mut iterate_repeated) = iterate_repeated_option {
+        loop {
+            let check_number: u64 = iterate_repeated.to_string().repeat(2).parse().unwrap();
+            if check_number > num2 {
+                break;
+            }
+            if check_number >= num1 {
+                total += check_number;
+            }
+            iterate_repeated += 1;
         }
-        if check_number >= num1 {
-            total += check_number;
-        }
-        iterate_repeated += 1;
-    } }
+    }
 
     total
 }
@@ -275,7 +277,6 @@ mod tests {
         let result = part_two_v1(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(4174379265u64));
     }
-
 
     #[test]
     fn test_execute_part_two_v2_example() {

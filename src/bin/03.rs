@@ -68,7 +68,6 @@ fn joltage_bank_v2(line: &str, length: usize) -> u64 {
         check_end += 1;
     }
 
-
     String::from_utf8(largest_num)
         .unwrap()
         .parse::<u64>()
@@ -120,7 +119,6 @@ fn joltage_bank_v3(line: &str, length: usize) -> u64 {
             }
         }
     }
-
 
     String::from_utf8(largest_num)
         .unwrap()

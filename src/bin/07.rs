@@ -41,14 +41,11 @@ fn run_01(input: &[u8]) -> u64 {
     count
 }
 
-fn propagate_bean(grid: &mut Vec<Vec<u8>>, j: usize, next_row: usize) {
+fn propagate_bean(grid: &mut [Vec<u8>], j: usize, next_row: usize) {
     let byte = grid[next_row][j];
 
-    match byte {
-        b'.' => {
-            grid[next_row][j] = b'|';
-        }
-        _ => {}
+    if byte == b'.' {
+        grid[next_row][j] = b'|';
     }
 }
 

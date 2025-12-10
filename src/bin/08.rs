@@ -40,6 +40,7 @@ struct Distance {
 }
 
 impl PartialOrd for Distance {
+    #[allow(clippy::non_canonical_partial_ord_impl)]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.distance.cmp(&other.distance))
     }
@@ -56,7 +57,7 @@ fn calculate_sqr_dis(a: &Point, b: &Point) -> i64 {
 }
 
 //Check later how to return less elements
-fn ordered_shortest_distances(points: &Vec<Point>) -> Vec<Distance> {
+fn ordered_shortest_distances(points: &[Point]) -> Vec<Distance> {
     let mut distances: Vec<Distance> = Vec::with_capacity(10000);
 
     for i in 0..points.len() {
@@ -74,7 +75,7 @@ fn ordered_shortest_distances(points: &Vec<Point>) -> Vec<Distance> {
     distances
 }
 
-fn find_grid(grids: &Vec<HashSet<usize>>, a: usize, b: usize) -> (Option<usize>, Option<usize>) {
+fn find_grid(grids: &[HashSet<usize>], a: usize, b: usize) -> (Option<usize>, Option<usize>) {
     let mut option1: Option<usize> = None;
     let mut option2: Option<usize> = None;
 
@@ -113,18 +114,16 @@ fn run_1_with_count(input: &str, count: usize) -> usize {
 
             let moved = grids.remove(large);
             grids[small].extend(moved);
+        } else if connect_grids_idx.0.is_some() {
+            let grid_id = connect_grids_idx.0.unwrap();
+            grids[grid_id].insert(shortest_dis.end_idx);
         } else {
-            if connect_grids_idx.0.is_some() {
-                let grid_id = connect_grids_idx.0.unwrap();
-                grids[grid_id].insert(shortest_dis.end_idx);
-            } else {
-                let grid_id = connect_grids_idx.1.unwrap();
-                grids[grid_id].insert(shortest_dis.start_idx);
-            }
+            let grid_id = connect_grids_idx.1.unwrap();
+            grids[grid_id].insert(shortest_dis.start_idx);
         }
     }
 
-    grids.sort_by(|a, b| b.len().cmp(&a.len()));
+    grids.sort_by_key(|b| std::cmp::Reverse(b.len()));
     grids[0].len() * grids[1].len() * grids[2].len()
 }
 
@@ -160,14 +159,12 @@ pub fn run_2(input: &str) -> i64 {
 
             let moved = grids.remove(large);
             grids[small].extend(moved);
+        } else if connect_grids_idx.0.is_some() {
+            let grid_id = connect_grids_idx.0.unwrap();
+            grids[grid_id].insert(shortest_dis.end_idx);
         } else {
-            if connect_grids_idx.0.is_some() {
-                let grid_id = connect_grids_idx.0.unwrap();
-                grids[grid_id].insert(shortest_dis.end_idx);
-            } else {
-                let grid_id = connect_grids_idx.1.unwrap();
-                grids[grid_id].insert(shortest_dis.start_idx);
-            }
+            let grid_id = connect_grids_idx.1.unwrap();
+            grids[grid_id].insert(shortest_dis.start_idx);
         }
         if grids[0].len() == points.len() {
             let point_start = &points[shortest_dis.start_idx];

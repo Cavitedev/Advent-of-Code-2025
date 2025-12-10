@@ -82,7 +82,7 @@ fn add_line_from_points(
     }
 }
 
-fn lines_from_points(points: &Vec<Point>) -> (Vec<HorizontalLine>, Vec<VerticalLine>) {
+fn lines_from_points(points: &[Point]) -> (Vec<HorizontalLine>, Vec<VerticalLine>) {
     let mut horizontal_lines: Vec<HorizontalLine> = Vec::with_capacity(250);
     let mut vertical_lines: Vec<VerticalLine> = Vec::with_capacity(250);
 
@@ -264,11 +264,10 @@ pub fn run_two(input: &str) -> i64 {
             let start = &points[i];
             let end = &points[j];
             let area = ((start.x - end.x).abs() + 1) * ((start.y - end.y).abs() + 1);
-            if area > best_area {
-                if is_valid_area(&horizontal_lines, &vertical_lines, start, end) {
+            if area > best_area
+                && is_valid_area(&horizontal_lines, &vertical_lines, start, end) {
                     best_area = area;
                 }
-            }
         }
     }
 

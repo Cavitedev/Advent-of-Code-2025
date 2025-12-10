@@ -21,7 +21,7 @@ fn part_1_on_parse(num1_str: &str, num2_str: &str) -> u64 {
     let mut total: u64 = 0;
     let mut iterate_repeated_option: Option<u64> = None;
 
-    if num1_str.len() % 2 == 0 {
+    if num1_str.len().is_multiple_of(2) {
         iterate_repeated_option = Some(
             num1_str
                 .get(0..(num1_str.len() / 2))
@@ -29,23 +29,20 @@ fn part_1_on_parse(num1_str: &str, num2_str: &str) -> u64 {
                 .parse()
                 .unwrap(),
         );
-    } else if num2_str.len() % 2 == 0 || num2_str.len() > num1_str.len() {
+    } else if num2_str.len().is_multiple_of(2) || num2_str.len() > num1_str.len() {
         iterate_repeated_option = Some(10u64.pow((num1_str.len() / 2) as u32));
     }
 
-    match iterate_repeated_option {
-        Some(mut iterate_repeated) => loop {
-            let check_number: u64 = iterate_repeated.to_string().repeat(2).parse().unwrap();
-            if check_number > num2 {
-                break;
-            }
-            if check_number >= num1 {
-                total += check_number;
-            }
-            iterate_repeated += 1;
-        },
-        None => {}
-    }
+    if let Some(mut iterate_repeated) = iterate_repeated_option { loop {
+        let check_number: u64 = iterate_repeated.to_string().repeat(2).parse().unwrap();
+        if check_number > num2 {
+            break;
+        }
+        if check_number >= num1 {
+            total += check_number;
+        }
+        iterate_repeated += 1;
+    } }
 
     total
 }
@@ -60,7 +57,7 @@ pub fn part_two_v1(input: &str) -> Option<u64> {
         let num2: u64 = num2_str.parse().unwrap();
         let mut total: u64 = 0;
         let last_check: u64 = num2_str
-            .get(0..((num2_str.len() + 1) / 2))
+            .get(0..num2_str.len().div_ceil(2))
             .unwrap()
             .parse()
             .unwrap();
@@ -158,7 +155,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     let largest_number_str = &largest_number.to_string();
 
     let last_check: u64 = largest_number_str
-        .get(0..((largest_number_str.len() + 1) / 2))
+        .get(0..largest_number_str.len().div_ceil(2))
         .unwrap()
         .parse()
         .unwrap();
@@ -215,7 +212,7 @@ fn sums_up_to(n: u64, div: u32) -> u64 {
     let log = n.ilog10();
     let grouped_sum = groupedsum(log, div);
     grouped_sum
-        + if (log + 1) % div == 0 {
+        + if (log + 1).is_multiple_of(div) {
             let rep = rep(log + 1, div);
             offset_sum(n / rep - 10u64.pow(log) / rep, log / div) * rep
         } else {
@@ -248,7 +245,7 @@ fn groupedsum(n: u32, div: u32) -> u64 {
         .step_by(div as usize)
         .skip(1)
         .map(|i| {
-            let log = i as u32 - 1;
+            let log = i - 1;
             let rep = rep(log + 1, div);
             let n = 10u64.pow(log + 1) - 1;
             offset_sum(n / rep - 10u64.pow(log) / rep, log / div) * rep

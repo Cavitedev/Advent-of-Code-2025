@@ -92,8 +92,8 @@ fn parse(input: &str) -> Vec<Machine> {
     machines
 }
 
-fn action_button(state: &Vec<bool>, button: &Vec<i32>) -> Vec<bool> {
-    let mut next_state = state.clone();
+fn action_button(state: &[bool], button: &Vec<i32>) -> Vec<bool> {
+    let mut next_state = state.to_owned();
 
     for num in button {
         if let Some(v) = next_state.get_mut(*num as usize) {
@@ -153,8 +153,8 @@ pub fn part_one(input: &str) -> Option<i32> {
 }
 
 fn lowest_combination_num_to_joltage_goal(
-    goal_state: &Vec<i32>,
-    buttons: &Vec<Vec<i32>>,
+    goal_state: &[i32],
+    buttons: &[Vec<i32>]
 ) -> Option<Vec<u64>> {
     let variables: Vec<Int> = (0..buttons.len())
         .map(|i| Int::fresh_const(&i.to_string()))
@@ -163,7 +163,7 @@ fn lowest_combination_num_to_joltage_goal(
     let opt = Optimize::new();
 
     for variable in &variables {
-        opt.assert(&variable.ge(&Int::from_i64(0)));
+        opt.assert(&variable.ge(Int::from_i64(0)));
     }
 
     for i in 0..goal_state.len() as i32 {

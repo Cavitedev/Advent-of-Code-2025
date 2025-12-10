@@ -51,12 +51,12 @@ fn run_1(input: &[u8]) -> u64 {
         let mut sum = nums[0][j];
 
         if operations[j] == b'+' {
-            for i in 1..nums.len() {
-                sum += nums[i][j];
+            for row in nums.iter().skip(1) {
+                sum += row[j];
             }
         } else {
-            for i in 1..nums.len() {
-                sum *= nums[i][j];
+            for row in nums.iter().skip(1) {
+                sum *= row[j];
             }
         }
         sum_total += sum
@@ -69,6 +69,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(run_1(input.as_bytes()))
 }
 
+#[allow(clippy::needless_range_loop)]
 fn run_2(input: &[u8]) -> u64 {
     let mut sum_total = 0;
 
@@ -103,14 +104,14 @@ fn run_2(input: &[u8]) -> u64 {
                 if op_byte == b' ' {
                     continue;
                 } else if op_byte == b'+' {
-                    for steps in 0..nums_len {
-                        sum_total += nums[steps];
+                    for num in nums.iter().take(nums_len) {
+                        sum_total += num;
                     }
                     nums_len = 0;
                 } else {
                     let mut product = 1;
-                    for steps in 0..nums_len {
-                        product *= nums[steps];
+                    for num in nums.iter().take(nums_len) {
+                        product *= num;
                     }
                     sum_total += product;
                     nums_len = 0;

@@ -1,6 +1,7 @@
 advent_of_code::solution!(4);
 use std::cmp::min;
 
+#[allow(clippy::needless_range_loop)]
 fn count_adjacent(grid: &[&[u8]], i: usize, j: usize) -> u8 {
     let mut count: u8 = 0;
     for i2 in i.saturating_sub(1)..min(i + 2, grid.len()) {
@@ -33,7 +34,8 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(count)
 }
 
-fn count_adjacent_rounds(grid: &Vec<Vec<u8>>, i: usize, j: usize, round: u8) -> u8 {
+#[allow(clippy::needless_range_loop)]
+fn count_adjacent_rounds(grid: &[Vec<u8>], i: usize, j: usize, round: u8) -> u8 {
     let mut count: u8 = 0;
     for i2 in i.saturating_sub(1)..min(i + 2, grid.len()) {
         for j2 in j.saturating_sub(1)..min(j + 2, grid[i].len()) {
@@ -81,6 +83,12 @@ pub struct UniqueQueue<T> {
     set: HashSet<T>,
 }
 
+impl<T: Eq + Hash + Clone> Default for UniqueQueue<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T: Eq + Hash + Clone> UniqueQueue<T> {
     pub fn new() -> Self {
         Self {
@@ -121,7 +129,8 @@ impl<T: Eq + Hash + Clone> UniqueQueue<T> {
     }
 }
 
-fn count_adjacent_v2(grid: &Vec<Vec<u8>>, i: usize, j: usize) -> u8 {
+#[allow(clippy::needless_range_loop)]
+fn count_adjacent_v2(grid: &[Vec<u8>], i: usize, j: usize) -> u8 {
     let mut count: u8 = 0;
     for i2 in i.saturating_sub(1)..min(i + 2, grid.len()) {
         for j2 in j.saturating_sub(1)..min(j + 2, grid[i].len()) {
@@ -136,7 +145,8 @@ fn count_adjacent_v2(grid: &Vec<Vec<u8>>, i: usize, j: usize) -> u8 {
     count
 }
 
-fn get_new_candidates(i: usize, j: usize, grid: &mut Vec<Vec<u8>>) -> Vec<(usize, usize)> {
+#[allow(clippy::needless_range_loop)]
+fn get_new_candidates(i: usize, j: usize, grid: &mut [Vec<u8>]) -> Vec<(usize, usize)> {
     let mut offsets: Vec<(usize, usize)> = Vec::with_capacity(8);
 
     for i2 in i.saturating_sub(1)..min(i + 2, grid.len()) {
@@ -151,14 +161,14 @@ fn get_new_candidates(i: usize, j: usize, grid: &mut Vec<Vec<u8>>) -> Vec<(usize
 }
 
 fn add_adjacent(
-    grid: &mut Vec<Vec<u8>>,
+    grid: &mut [Vec<u8>],
     count: &mut u64,
     queue: &mut UniqueQueue<(usize, usize)>,
     i: usize,
     j: usize,
 ) {
     if grid[i][j] == b'@' {
-        let counted_adjacent = count_adjacent_v2(&grid, i, j);
+        let counted_adjacent = count_adjacent_v2(grid, i, j);
         if counted_adjacent < 4 {
             grid[i][j] = b'.';
             *count += 1;

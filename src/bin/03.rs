@@ -29,12 +29,12 @@ fn joltage_bank_v1(line: &str, length: usize) -> u64 {
             *a = char;
         }
     }
-    let joltage = largest_num
+
+    largest_num
         .iter()
         .collect::<String>()
         .parse::<u64>()
-        .unwrap();
-    joltage
+        .unwrap()
 }
 
 pub fn part_two_v1(input: &str) -> Option<u64> {
@@ -47,6 +47,7 @@ pub fn part_two_v1(input: &str) -> Option<u64> {
     Some(sum)
 }
 
+#[allow(clippy::needless_range_loop)]
 fn joltage_bank_v2(line: &str, length: usize) -> u64 {
     let line_chars: &[u8] = line.as_bytes();
     let mut largest_num: Vec<u8> = Vec::with_capacity(length);
@@ -67,11 +68,11 @@ fn joltage_bank_v2(line: &str, length: usize) -> u64 {
         check_end += 1;
     }
 
-    let joltage = String::from_utf8(largest_num)
+
+    String::from_utf8(largest_num)
         .unwrap()
         .parse::<u64>()
-        .unwrap();
-    joltage
+        .unwrap()
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
@@ -120,11 +121,11 @@ fn joltage_bank_v3(line: &str, length: usize) -> u64 {
         }
     }
 
-    let joltage = String::from_utf8(largest_num)
+
+    String::from_utf8(largest_num)
         .unwrap()
         .parse::<u64>()
-        .unwrap();
-    joltage
+        .unwrap()
 }
 
 pub fn part_one_v3(input: &str) -> Option<u64> {

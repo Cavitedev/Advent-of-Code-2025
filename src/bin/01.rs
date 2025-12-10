@@ -21,7 +21,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     input.lines().for_each(|line| {
         let (turn, value) = line.split_at(1);
         let move_value: i64 = value.parse().unwrap();
-        let last_value: i64 = current_value.clone();
+        let last_value: i64 = current_value;
         current_value = turn_wheel(turn, move_value, &current_value);
         if (last_value > 0) != (current_value > 0) && last_value != 0 {
             total_count += 1

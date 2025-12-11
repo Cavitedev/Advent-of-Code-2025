@@ -1,0 +1,3 @@
+a: b out
+b: c out
+c: out
